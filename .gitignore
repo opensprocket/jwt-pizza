@@ -13,3 +13,12 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# NYC
+coverage
+node_modules
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+.nyc_output
