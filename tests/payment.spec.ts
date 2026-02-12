@@ -165,3 +165,38 @@ test('payment page displays order details', async ({ page }) => {
   await expect(page.getByText('Pepperoni')).toBeVisible();
 });
 
+test('payment page processes payment successfully', async ({ page }) => {
+  // Use utility to login and create order
+  await loginAndOrder(page);
+
+  // Mock the order API
+  await page.route('*/**/api/order', async (route) => {
+    const orderRes = {
+      order: {
+        items: [
+          { menuId: 1, description: 'Veggie', price: 0.0038 },
+          { menuId: 2, description: 'Pepperoni', price: 0.0042 },
+        ],
+        storeId: 1,
+        franchiseId: 1,
+        id: 123,
+      },
+      jwt: 'fake-jwt-token',
+    };
+    expect(route.request().method()).toBe('POST');
+    await route.fulfill({ json: orderRes });
+  });
+
+  // Click checkout to go to payment
+  await page.getByRole('button', { name: 'Checkout' }).click();
+
+  // Wait for payment page to load
+  await expect(page).toHaveURL(/.*payment/);
+
+  // Click Pay now
+  await page.getByRole('button', { name: 'Pay now' }).click();
+
+  // Should navigate to delivery page
+  await expect(page).toHaveURL(/.*delivery/);
+});
+
