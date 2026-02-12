@@ -82,3 +82,86 @@ async function loginAndOrder(page: Page) {
   await expect(checkoutButton).toBeEnabled();
 }
 
+test('payment page displays order details', async ({ page }) => {
+  
+  await page.route('*/**/api/user/me', async (route) => {
+    const userMeRes = {
+      id: 5,
+      name: 'pizza diner',
+      email: 'd@jwt.com',
+      roles: [{ role: 'diner' }],
+      iat: 12345678
+    };
+    expect(route.request().method()).toBe('GET');
+    await route.fulfill({ json: userMeRes });
+  });
+  
+  await page.route('*/**/api/order', async (route) => {
+    const orderReq = {
+      items: [
+        {
+          menuId: 1,
+          description: "Veggie",
+          price: 0.0038
+        },
+        {
+          menuId: 2,
+          description: "Pepperoni",
+          price: 0.0042
+        }
+      ],
+      storeId: "1",
+      franchiseId: 1 
+    };
+    
+    const orderRes = {
+      order: {
+        items: [
+            {
+                menuId: 1,
+                description: "Veggie",
+                price: 0.0038
+            },
+            {
+                menuId: 2,
+                description: "Pepperoni",
+                price: 0.0042
+            }
+        ],
+        storeId: "1",
+        franchiseId: 1,
+        id: 1
+    },
+    "jwt": "test-jwt-value"
+    };
+    
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toMatchObject(orderReq);
+    await route.fulfill({ json: orderRes });
+  });
+  
+  await loginAndOrder(page);
+
+  // Click checkout to go to payment
+  await page.getByRole('button', { name: 'Checkout' }).click();
+
+  // Verify we're on payment page
+  await expect(page).toHaveURL(/.*payment/);
+
+  // Verify heading
+  await expect(page.getByRole('heading', { name: 'So worth it' })).toBeVisible();
+
+  // Verify order summary message
+  await expect(page.getByText(/Send me .*pizzas right now!/)).toBeVisible();
+
+  // Verify Pay now button exists
+  await expect(page.getByRole('button', { name: 'Pay now' })).toBeVisible();
+  
+  // Verify Cancel button exists
+  await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible();
+
+  // Verify pizza items are shown in table
+  await expect(page.getByText('Veggie')).toBeVisible();
+  await expect(page.getByText('Pepperoni')).toBeVisible();
+});
+
