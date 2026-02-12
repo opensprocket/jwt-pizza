@@ -13,7 +13,7 @@
     "test:coverage": "nyc --reporter=json-summary --reporter=text playwright test"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.1",
+    "@playwright/test": "^1.58.2",
     "@types/node": "^25.2.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
