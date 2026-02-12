@@ -220,3 +220,29 @@ test('payment page cancel returns to menu', async ({ page }) => {
   await expect(page.getByText('Selected pizzas: 2')).toBeVisible();
 });
 
+test('payment page handles payment errors', async ({ page }) => {
+  // Use utility to login and create order
+  await loginAndOrder(page);
+
+  // Mock the order API to return an error
+  await page.route('*/**/api/order', async (route) => {
+    await route.fulfill({ 
+      status: 500,
+      json: { message: 'Payment processing failed' }
+    });
+  });
+
+  // Click checkout to go to payment
+  await page.getByRole('button', { name: 'Checkout' }).click();
+
+  // Wait for payment page to load
+  await expect(page).toHaveURL(/.*payment/);
+
+  // Click Pay now
+  await page.getByRole('button', { name: 'Pay now' }).click();
+
+  // Should display error message
+  await page.waitForTimeout(500);
+  await expect(page.getByText('⚠️ Payment processing failed')).toBeVisible();
+});
+
