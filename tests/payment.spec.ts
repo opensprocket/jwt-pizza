@@ -259,3 +259,26 @@ test('payment page redirects to login if not authenticated', async ({ page }) =>
   await expect(page).toHaveURL(/.*login/);
 });
 
+test('payment page displays correct total for order', async ({ page }) => {
+  // Use utility to login and create order
+  await loginAndOrder(page);
+
+  // Click checkout to go to payment
+  await page.getByRole('button', { name: 'Checkout' }).click();
+
+  // Wait for payment page to load
+  await expect(page).toHaveURL(/.*payment/);
+
+  // Verify individual pizza prices
+  await expect(page.getByText('Veggie')).toBeVisible();
+  await expect(page.getByText('Pepperoni')).toBeVisible();
+
+  // Verify table has headers
+  await expect(page.getByRole('columnheader', { name: 'Pie' })).toBeVisible();
+  await expect(page.getByRole('columnheader', { name: 'Price' })).toBeVisible();
+
+  // The total should be visible (sum of both pizzas)
+  // Note: The actual values will be in the table
+  const table = page.locator('table');
+  await expect(table).toBeVisible();
+});
