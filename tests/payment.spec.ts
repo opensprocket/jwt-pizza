@@ -246,3 +246,16 @@ test('payment page handles payment errors', async ({ page }) => {
   await expect(page.getByText('⚠️ Payment processing failed')).toBeVisible();
 });
 
+test('payment page redirects to login if not authenticated', async ({ page }) => {
+  // Mock the user API to return null (not authenticated)
+  await page.route('*/**/api/auth', async (route) => {
+    await route.fulfill({ json: null });
+  });
+
+  // Try to go directly to payment page
+  await page.goto('http://localhost:5173/payment');
+
+  // Should redirect to login
+  await expect(page).toHaveURL(/.*login/);
+});
+
