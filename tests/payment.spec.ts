@@ -200,3 +200,23 @@ test('payment page processes payment successfully', async ({ page }) => {
   await expect(page).toHaveURL(/.*delivery/);
 });
 
+test('payment page cancel returns to menu', async ({ page }) => {
+  // Use utility to login and create order
+  await loginAndOrder(page);
+
+  // Click checkout to go to payment
+  await page.getByRole('button', { name: 'Checkout' }).click();
+
+  // Wait for payment page to load
+  await expect(page).toHaveURL(/.*payment/);
+
+  // Click Cancel
+  await page.getByRole('button', { name: 'Cancel' }).click();
+
+  // Should navigate back to menu with order state preserved
+  await expect(page).toHaveURL(/.*menu/);
+  
+  // Verify the order state is preserved (2 pizzas selected)
+  await expect(page.getByText('Selected pizzas: 2')).toBeVisible();
+});
+
