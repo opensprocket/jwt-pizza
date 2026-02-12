@@ -1,6 +1,23 @@
 import { test, expect } from 'playwright-test-coverage';
 
 test('registration successful', async ({ page }) => {
+  
+  await page.route('*/**/api/auth', async (route) => {
+    const loginReq = {name: 'Bob', email: 'bob@bob.com', password: 'hunter2', }
+    const loginRes = {
+      user: {
+        id: 9,
+        name: "Bob",
+        email: "bob@bob.com",
+        roles: [{ role: 'diner'}],
+      },
+      token: 'xyzpdq'
+    }
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toMatchObject(loginReq);
+    await route.fulfill({json: loginRes });
+  });
+  
   await page.goto('http://localhost:5173/');
   await page.getByRole('link', { name: 'Register' }).click();
   await page.getByRole('textbox', { name: 'Full name' }).click();
@@ -10,7 +27,6 @@ test('registration successful', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
   await page.getByRole('textbox', { name: 'Password' }).fill('hunter2');
   await page.getByRole('button', { name: 'Register' }).click();
-  
   await page.getByRole('link', { name: 'B', exact: true }).click();
   await page.getByText('Bob', { exact: true }).click();
   await page.getByText('bob@bob.com').click();
