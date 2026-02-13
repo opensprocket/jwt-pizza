@@ -104,3 +104,28 @@ test('franchise dashboard displays information for franchisee', async ({ page })
   await expect(page.getByRole('button', { name: 'Close' }).first()).toBeVisible();
 });
 
+test('franchise dashboard displays marketing page for users without franchise', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+
+  // Set up mocks
+  await mockFranchiseeLogin(page);
+  await mockNoFranchise(page);
+
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('f@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('franchisee');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // Navigate to Franchise Dashboard
+  await page.getByLabel('Global').getByRole('link', { name: 'Franchise' }).click();
+
+  // Verify Marketing Content
+  await expect(page.getByRole('heading', { name: 'So you want a piece of the pie?' })).toBeVisible();
+  await expect(page.getByText('If you are already a franchisee, please ')).toBeVisible();
+  await expect(page.getByText('Call now')).toBeVisible();
+  
+  // Verify Create Store button is NOT present
+  await expect(page.getByRole('button', { name: 'Create store' })).not.toBeVisible();
+});
+
