@@ -274,3 +274,26 @@ test('admin dashboard close franchise navigation', async ({ page }) => {
   await expect(page).toHaveURL(/.*admin-dashboard\/close-franchise/);
 });
 
+test('admin dashboard close store navigation', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  
+  // Set up mocks
+  await mockAdminLogin(page);
+  await mockSingleFranchise(page, 'TestFranchise', 'TestStore');
+
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('admin');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
+  // Click on Admin link
+  await page.getByRole('link', { name: 'Admin' }).click();
+
+  // Click Close button for store (second one in the list)
+  const closeButtons = page.getByRole('button', { name: /Close/ });
+  await closeButtons.nth(1).click();
+
+  // Should navigate to close store page
+  await expect(page).toHaveURL(/.*admin-dashboard\/close-store/);
+});
