@@ -164,3 +164,38 @@ test('admin dashboard displays franchises and stores', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add Franchise' })).toBeVisible();
 });
 
+test('admin dashboard pagination works', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  
+  // Set up mocks
+  await mockAdminLogin(page);
+  await mockFranchisesPagination(page);
+
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('admin');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
+  // Click on Admin link
+  await page.getByRole('link', { name: 'Admin' }).click();
+
+  // Verify first page
+  await expect(page.getByText('Franchise 1')).toBeVisible();
+
+  // Previous button should be disabled on first page
+  await expect(page.getByRole('button', { name: '«' })).toBeDisabled();
+
+  // Click next page
+  await page.getByRole('button', { name: '»' }).click();
+  
+  // Verify second page loaded
+  await expect(page.getByText('Franchise 2')).toBeVisible();
+
+  // Click previous page
+  await page.getByRole('button', { name: '«' }).click();
+  
+  // Should be back on first page
+  await expect(page.getByText('Franchise 1')).toBeVisible();
+});
+
