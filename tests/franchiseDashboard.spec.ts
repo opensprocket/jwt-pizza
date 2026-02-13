@@ -49,3 +49,25 @@ async function mockUserFranchise(page: Page) {
   });
 }
 
+// Mock empty franchise list (for new users)
+async function mockNoFranchise(page: Page) {
+  await page.route('*/**/api/franchise/*', async (route) => {
+    await route.fulfill({ json: [] });
+  });
+}
+
+// Mock store creation
+async function mockCreateStore(page: Page) {
+  await page.route('*/**/api/franchise/*/store', async (route) => {
+    const storeReq = { name: 'Orem' };
+    const storeRes = {
+      id: 3,
+      name: 'Orem',
+      totalRevenue: 0,
+    };
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toMatchObject(storeReq);
+    await route.fulfill({ json: storeRes });
+  });
+}
+
