@@ -199,3 +199,30 @@ test('admin dashboard pagination works', async ({ page }) => {
   await expect(page.getByText('Franchise 1')).toBeVisible();
 });
 
+test('admin dashboard filter franchises works', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  
+  // Set up mocks
+  await mockAdminLogin(page);
+  await mockFranchisesWithFilter(page);
+
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('admin');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
+  // Click on Admin link
+  await page.getByRole('link', { name: 'Admin' }).click();
+
+  // Initially both franchises should be visible
+  await expect(page.getByText('PizzaCorp')).toBeVisible();
+  await expect(page.getByText('Burger Place')).toBeVisible();
+
+  // Type in filter
+  await page.getByPlaceholder('Filter franchises').fill('Pizza');
+  await page.getByRole('button', { name: 'Submit' }).click();
+
+  // Only PizzaCorp should be visible now
+  await expect(page.getByText('PizzaCorp')).toBeVisible();
+});
