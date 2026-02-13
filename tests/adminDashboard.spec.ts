@@ -112,3 +112,28 @@ async function mockFranchisesWithFilter(page: Page) {
   });
 }
 
+// Helper function to mock empty franchises
+async function mockEmptyFranchises(page: Page) {
+  await page.route('*/**/api/franchise*', async (route) => {
+    await route.fulfill({ json: { franchises: [], more: false } });
+  });
+}
+
+// Helper function to mock single franchise with one store
+async function mockSingleFranchise(page: Page, franchiseName: string, storeName: string) {
+  await page.route('*/**/api/franchise*', async (route) => {
+    const franchisesRes = {
+      franchises: [
+        {
+          id: 1,
+          name: franchiseName,
+          admins: [{ id: 1, name: 'Admin', email: 'admin@test.com' }],
+          stores: [{ id: 1, name: storeName, totalRevenue: 100 }],
+        },
+      ],
+      more: false,
+    };
+    await route.fulfill({ json: franchisesRes });
+  });
+}
+
