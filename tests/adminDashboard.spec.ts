@@ -226,3 +226,27 @@ test('admin dashboard filter franchises works', async ({ page }) => {
   // Only PizzaCorp should be visible now
   await expect(page.getByText('PizzaCorp')).toBeVisible();
 });
+
+test('admin dashboard create franchise navigation', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  
+  // Set up mocks
+  await mockAdminLogin(page);
+  await mockEmptyFranchises(page);
+
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('admin');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
+  // Click on Admin link
+  await page.getByRole('link', { name: 'Admin' }).click();
+
+  // Click Add Franchise button
+  await page.getByRole('button', { name: 'Add Franchise' }).click();
+
+  // Should navigate to create franchise page
+  await expect(page).toHaveURL(/.*admin-dashboard\/create-franchise/);
+});
+
