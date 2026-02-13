@@ -137,3 +137,30 @@ async function mockSingleFranchise(page: Page, franchiseName: string, storeName:
   });
 }
 
+test('admin dashboard displays franchises and stores', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  
+  // Set up mocks
+  await mockAdminLogin(page);
+  await mockFranchises(page);
+  
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('admin');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
+  // Click on Admin link in navigation
+  await page.getByRole('link', { name: 'Admin' }).click();
+  
+  // Verify heading
+  await expect(page.getByRole('heading', { name: "Mama Ricci's kitchen" })).toBeVisible();
+
+  // Verify franchise names are displayed
+  await expect(page.getByText('PizzaCorp')).toBeVisible();
+  await expect(page.getByText('Pizza Paradise')).toBeVisible();
+
+  // Verify Add Franchise button exists
+  await expect(page.getByRole('button', { name: 'Add Franchise' })).toBeVisible();
+});
+
