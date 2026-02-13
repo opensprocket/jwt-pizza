@@ -199,7 +199,7 @@ test('payment page processes payment successfully', async ({ page }) => {
   
   // Wait for payment page to load
   
-  await expect(page).toHaveURL('http://localhost:5173/payment');
+  await expect(page).toHaveURL(/.*payment/);
 
   // Click Pay now
   await page.getByRole('button', { name: 'Pay now' }).click();
@@ -215,8 +215,14 @@ test('payment page cancel returns to menu', async ({ page }) => {
   // Click checkout to go to payment
   await page.getByRole('button', { name: 'Checkout' }).click();
 
+  await page.getByRole('textbox', { name: 'Email address' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('d@jwt.com');
+  await page.getByRole('textbox', { name: 'Email address' }).press('Tab');
+  await page.getByRole('textbox', { name: 'Password' }).fill('diner');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
   // Wait for payment page to load
-  await expect(page).toHaveURL('http://localhost:5173/payment');
+  await expect(page).toHaveURL(/.*payment/);
 
   // Click Cancel
   await page.getByRole('button', { name: 'Cancel' }).click();
@@ -229,7 +235,6 @@ test('payment page cancel returns to menu', async ({ page }) => {
 });
 
 test('payment page handles payment errors', async ({ page }) => {
-  // Use utility to login and create order
   await loginAndOrder(page);
 
   // Mock the order API to return an error
@@ -243,14 +248,17 @@ test('payment page handles payment errors', async ({ page }) => {
   // Click checkout to go to payment
   await page.getByRole('button', { name: 'Checkout' }).click();
 
-  // Wait for payment page to load
+  await page.getByRole('textbox', { name: 'Email address' }).fill('d@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('diner');
+  await page.getByRole('button', { name: 'Login' }).click();
+  
   await expect(page).toHaveURL(/.*payment/);
 
   // Click Pay now
   await page.getByRole('button', { name: 'Pay now' }).click();
 
   // Should display error message
-  await page.waitForTimeout(500);
+  // await page.waitForTimeout(500);
   await expect(page.getByText('⚠️ Payment processing failed')).toBeVisible();
 });
 
