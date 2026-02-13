@@ -29,3 +29,23 @@ async function mockFranchiseeLogin(page: Page) {
   });
 }
 
+// Mock getting the specific franchise for the logged-in user
+async function mockUserFranchise(page: Page) {
+  await page.route('*/**/api/franchise/*', async (route) => {
+    // Return an array containing the user's franchise
+    const franchiseRes = [
+        {
+          id: 1,
+          name: 'Pizza Pocket',
+          admins: [{ id: 2, name: 'Franchisee User', email: 'f@jwt.com' }],
+          stores: [
+            { id: 1, name: 'SLC', totalRevenue: 5000 },
+            { id: 2, name: 'Provo', totalRevenue: 2500 },
+          ],
+        }
+    ];
+    expect(route.request().method()).toBe('GET');
+    await route.fulfill({ json: franchiseRes });
+  });
+}
+
