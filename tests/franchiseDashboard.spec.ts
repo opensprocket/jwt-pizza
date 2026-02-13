@@ -205,3 +205,24 @@ test('close store navigation works', async ({ page }) => {
   await expect(page).toHaveURL(/.*franchise-dashboard\/close-store/);
 });
 
+test('logout clears user and navigates home', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+
+  await mockFranchiseeLogin(page);
+  
+  // Login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('f@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('franchisee');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // Verify logged in state (link with initials exists)
+  await expect(page.getByRole('link', { name: 'FU' })).toBeVisible();
+
+  // Perform logout
+  await page.getByRole('link', { name: 'Logout' }).click();
+
+  // Verify redirected to home/login and user initials are gone
+  await expect(page.getByRole('link', { name: 'Login' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'FU' })).not.toBeVisible();
+});
