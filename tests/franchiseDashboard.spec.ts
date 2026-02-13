@@ -160,3 +160,26 @@ test('create store flow works correctly', async ({ page }) => {
   await expect(page).toHaveURL(/.*franchise-dashboard/);
 });
 
+test('cancel create store navigates back', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+
+  await mockFranchiseeLogin(page);
+  await mockUserFranchise(page);
+
+  // Login/Nav
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('f@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('franchisee');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByLabel('Global').getByRole('link', { name: 'Franchise' }).click();
+
+  // Enter Create Store
+  await page.getByRole('button', { name: 'Create store' }).click();
+
+  // Click Cancel
+  await page.getByRole('button', { name: 'Cancel' }).click();
+
+  // Check URL
+  await expect(page).toHaveURL(/.*franchise-dashboard/);
+});
+
