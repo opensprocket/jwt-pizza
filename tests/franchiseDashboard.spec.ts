@@ -183,3 +183,25 @@ test('cancel create store navigates back', async ({ page }) => {
   await expect(page).toHaveURL(/.*franchise-dashboard/);
 });
 
+test('close store navigation works', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+
+  await mockFranchiseeLogin(page);
+  await mockUserFranchise(page);
+
+  // Login/Nav
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('f@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('franchisee');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByLabel('Global').getByRole('link', { name: 'Franchise' }).click();
+
+  // Click Close on the first store
+  // The table row contains the 'Close' button
+  const closeButtons = page.getByRole('button', { name: 'Close' });
+  await closeButtons.first().click();
+
+  // Verify navigation to close-store page
+  await expect(page).toHaveURL(/.*franchise-dashboard\/close-store/);
+});
+
