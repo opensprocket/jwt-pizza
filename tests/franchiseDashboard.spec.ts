@@ -71,3 +71,36 @@ async function mockCreateStore(page: Page) {
   });
 }
 
+test('franchise dashboard displays information for franchisee', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+
+  // Set up mocks
+  await mockFranchiseeLogin(page);
+  await mockUserFranchise(page);
+
+  // Perform login
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('f@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('franchisee');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // Navigate to Franchise Dashboard
+  await page.getByLabel('Global').getByRole('link', { name: 'Franchise' }).click();
+
+  // Verify Franchise Name in header
+  await expect(page.getByRole('heading', { name: 'Pizza Pocket' })).toBeVisible();
+
+  // Verify Franchise Description
+  await expect(page.getByText('Everything you need to run an JWT Pizza franchise')).toBeVisible();
+
+  // Verify Stores table content
+  await expect(page.getByText('SLC')).toBeVisible();
+  await expect(page.getByText('5,000 ₿')).toBeVisible();
+  await expect(page.getByText('Provo')).toBeVisible();
+  await expect(page.getByText('2,500 ₿')).toBeVisible();
+
+  // Verify actions
+  await expect(page.getByRole('button', { name: 'Create store' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Close' }).first()).toBeVisible();
+});
+
