@@ -129,3 +129,34 @@ test('franchise dashboard displays marketing page for users without franchise', 
   await expect(page.getByRole('button', { name: 'Create store' })).not.toBeVisible();
 });
 
+test('create store flow works correctly', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+
+  // Set up mocks
+  await mockFranchiseeLogin(page);
+  await mockUserFranchise(page);
+  await mockCreateStore(page);
+
+  // Login and Navigate
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address' }).fill('f@jwt.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('franchisee');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByLabel('Global').getByRole('link', { name: 'Franchise' }).click();
+
+  // Click Create Store
+  await page.getByRole('button', { name: 'Create store' }).click();
+
+  // Verify URL
+  await expect(page).toHaveURL(/.*franchise-dashboard\/create-store/);
+
+  // Fill Form
+  await page.getByPlaceholder('store name').fill('Orem');
+
+  // Submit
+  await page.getByRole('button', { name: 'Create' }).click();
+
+  // Verify navigation back to dashboard
+  await expect(page).toHaveURL(/.*franchise-dashboard/);
+});
+
