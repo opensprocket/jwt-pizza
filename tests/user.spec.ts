@@ -2,6 +2,51 @@ import { test, expect } from 'playwright-test-coverage';
 
 test('updateUser', async ({ page }) => {
   const email = `user${Math.floor(Math.random() * 10000)}@jwt.com`;
+  
+  await page.route('*/**/api/auth', async (route) => {
+    const request = route.request();
+    if (request.method() === 'POST') {
+      const registerReq = { name: 'pizza diner', email: email, password: 'diner' };
+      const registerRes = {
+        user: {
+          id: 1,
+          name: 'pizza diner',
+          email: email,
+          roles: [{ role: 'diner' }],
+        },
+        token: 'registerToken123',
+      };
+      expect(request.postDataJSON()).toMatchObject(registerReq);
+      await route.fulfill({ json: registerRes });
+    } else if (request.method() === 'PUT') {
+      const loginReq = { email: email, password: 'diner' };
+      const loginRes = {
+        user: {
+          id: 1,
+          name: 'pizza diner',
+          email: email,
+          roles: [{ role: 'diner' }],
+        },
+        token: 'loginToken456',
+      };
+      expect(request.postDataJSON()).toMatchObject(loginReq);
+      await route.fulfill({ json: loginRes });
+    }
+  });
+
+  await page.route('*/**/api/user/*', async (route) => {
+    const updateUserRes = {
+      user: {
+        id: 1,
+        name: 'pizza diner',
+        email: email,
+        roles: [{ role: 'diner' }],
+      },
+      token: 'updatedToken789',
+    };
+    await route.fulfill({ json: updateUserRes });
+  });
+
   await page.goto('/');
   await page.getByRole('link', { name: 'Register' }).click();
   await page.getByRole('textbox', { name: 'Full name' }).fill('pizza diner');
