@@ -18,6 +18,7 @@ export default function AdminDashboard(props: Props) {
   const filterFranchiseRef = React.useRef<HTMLInputElement>(null);
   const [userList, setUserList] = React.useState<UserList>({ users: [], more: false });
   const [userPage, setUserPage] = React.useState(0);
+  const [userFilterQuery, setUserFilterQuery] = React.useState('*');
   const filterUserRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     (async () => {
@@ -47,9 +48,8 @@ export default function AdminDashboard(props: Props) {
   }
   
   async function filterUsers() {
+    setUserFilterQuery(filterUserRef.current?.value || '*');
     setUserPage(0);
-    const nameQuery = filterUserRef.current?.value || '*';
-    setUserList(await pizzaService.listUsers(0, 10, 'nameQuery'));
   }
   
   async function deleteUser(user: User) {
