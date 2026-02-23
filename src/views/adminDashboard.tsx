@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import NotFound from './notFound';
 import Button from '../components/button';
 import { pizzaService } from '../service/service';
-import { Franchise, FranchiseList, Role, Store, User } from '../service/pizzaService';
+import { Franchise, FranchiseList, Role, Store, User, UserList } from '../service/pizzaService';
 import { TrashIcon } from '../icons';
 
 interface Props {
@@ -16,13 +16,20 @@ export default function AdminDashboard(props: Props) {
   const [franchiseList, setFranchiseList] = React.useState<FranchiseList>({ franchises: [], more: false });
   const [franchisePage, setFranchisePage] = React.useState(0);
   const filterFranchiseRef = React.useRef<HTMLInputElement>(null);
-
+  const [userList, setUserList] = React.useState<UserList>({ users: [], more: false });
+  const [userPage, setUserPage] = React.useState(0);
+  const filterUserRef = React.useRef<HTMLInputElement>(null);
   React.useEffect(() => {
     (async () => {
       setFranchiseList(await pizzaService.getFranchises(franchisePage, 3, '*'));
     })();
   }, [props.user, franchisePage]);
 
+  React.useEffect(() => {
+    (async () => {
+      setUserList(await pizzaService.listUsers(userPage, 10, '*'));
+    })();
+  }, [props.user, userPage]);
   function createFranchise() {
     navigate('/admin-dashboard/create-franchise');
   }
