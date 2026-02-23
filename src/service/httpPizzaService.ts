@@ -29,7 +29,9 @@ class HttpPizzaService implements PizzaService {
         }
 
         const r = await fetch(path, options);
-        const j = await r.json();
+        const text = await r.text();
+        const j = text ? JSON.parse(text) : {};
+        
         if (r.ok) {
           resolve(j);
         } else {
