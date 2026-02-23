@@ -19,6 +19,40 @@ const usersPageResponse = {
     more: false,
 };
 
+// Matches GET /api/franchise?page=0&limit=3&name=*
+const franchisesPageResponse = {
+    franchises: [
+        {
+            id: 21,
+            name: 'Multi Admin Franchise 107r93',
+            admins: [
+                { id: 133, name: 'Franchisee User', email: 'franchisee-vq7xg43hk2@test.com' },
+                { id: 135, name: 'Regular User',    email: 'regular-birao6ws3j@test.com'    },
+            ],
+            stores: [],
+        },
+        {
+            id: 102,
+            name: 'Multi Admin Franchise 226ekm',
+            admins: [
+                { id: 284, name: 'Franchisee User', email: 'franchisee-fa6bd31wkn@test.com' },
+                { id: 286, name: 'Regular User',    email: 'regular-2peh51k2bx@test.com'    },
+            ],
+            stores: [],
+        },
+        {
+            id: 138,
+            name: 'Multi Admin Franchise 38zcgb',
+            admins: [
+                { id: 366, name: 'Franchisee User', email: 'franchisee-a32yx8bot1@test.com' },
+                { id: 368, name: 'Regular User',    email: 'regular-dsaaymxcfz@test.com'    },
+            ],
+            stores: [],
+        },
+    ],
+    more: true,
+};
+
 test('admin can view user list', async ({ page }) => {
     // Mock PUT /api/auth  (login)
     await page.route('*/**/api/auth', async (route) => {
