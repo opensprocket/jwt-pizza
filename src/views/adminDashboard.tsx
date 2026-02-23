@@ -125,10 +125,10 @@ export default function AdminDashboard(props: Props) {
                             </button>
                           </td>
                           <td colSpan={4} className="text-end text-sm font-medium">
-                            <button className="w-12 p-1 text-sm font-semibold rounded-lg border border-transparent bg-white text-grey border-grey m-1 hover:bg-orange-200 disabled:bg-neutral-300 " onClick={() => setFranchisePage(franchisePage - 1)} disabled={franchisePage <= 0}>
+                            <button data-testid="franchisee-previous" data-className="w-12 p-1 text-sm font-semibold rounded-lg border border-transparent bg-white text-grey border-grey m-1 hover:bg-orange-200 disabled:bg-neutral-300 " onClick={() => setFranchisePage(franchisePage - 1)} disabled={franchisePage <= 0}>
                               «
                             </button>
-                            <button className="w-12 p-1 text-sm font-semibold rounded-lg border border-transparent bg-white text-grey border-grey m-1 hover:bg-orange-200 disabled:bg-neutral-300" onClick={() => setFranchisePage(franchisePage + 1)} disabled={!franchiseList.more}>
+                            <button data-testid="franchisee-next" className="w-12 p-1 text-sm font-semibold rounded-lg border border-transparent bg-white text-grey border-grey m-1 hover:bg-orange-200 disabled:bg-neutral-300" onClick={() => setFranchisePage(franchisePage + 1)} disabled={!franchiseList.more}>
                               »
                             </button>
                           </td>
@@ -203,6 +203,7 @@ export default function AdminDashboard(props: Props) {
                           </td>
                           <td colSpan={3} className="text-end text-sm font-medium">
                             <button
+                              data-testid="users-previous"
                               className="w-12 p-1 text-sm font-semibold rounded-lg border border-transparent bg-white text-grey border-grey m-1 hover:bg-orange-200 disabled:bg-neutral-300"
                               onClick={() => setUserPage(userPage - 1)}
                               disabled={userPage <= 0}

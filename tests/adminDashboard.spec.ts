@@ -184,16 +184,16 @@ test('admin dashboard pagination works', async ({ page }) => {
   await expect(page.getByText('Franchise 1')).toBeVisible();
 
   // Previous button should be disabled on first page
-  await expect(page.getByRole('button', { name: '«' })).toBeDisabled();
+  await expect(page.getByTestId('franchisee-previous')).toBeDisabled();
 
   // Click next page
-  await page.getByRole('button', { name: '»' }).click();
+  await page.getByTestId('franchisee-next').click();
   
   // Verify second page loaded
   await expect(page.getByText('Franchise 2')).toBeVisible();
 
   // Click previous page
-  await page.getByRole('button', { name: '«' }).click();
+  await page.getByTestId('franchisee-previous').click();
   
   // Should be back on first page
   await expect(page.getByText('Franchise 1')).toBeVisible();
