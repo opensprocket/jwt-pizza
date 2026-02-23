@@ -45,7 +45,21 @@ export default function AdminDashboard(props: Props) {
   async function filterFranchises() {
     setFranchiseList(await pizzaService.getFranchises(franchisePage, 10, `*${filterFranchiseRef.current?.value}*`));
   }
-
+  
+  async function filterUsers() {
+    setUserPage(0);
+    const nameQuery = filterUserRef.current?.value || '*';
+    setUserList(await pizzaService.listUsers(0, 10, 'nameQuery'));
+  }
+  
+  async function deleteUser(user: User) {
+    if (!user.id) return;
+    await pizzaService.deleteUser(user.id);
+    // reload after deletion
+    const nameQuery = filterUserRef.current?.value || '*';
+    setUserList(await pizzaService.listUsers(userPage, 10, nameQuery || '*'));
+  }
+  
   let response = <NotFound />;
   if (Role.isRole(props.user, Role.Admin)) {
     response = (
