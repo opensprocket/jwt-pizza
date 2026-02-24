@@ -58,7 +58,7 @@ export default function AdminDashboard(props: Props) {
   async function deleteUser(user: User) {
     if (!user.id) return;
     try {
-    await pizzaService.deleteUser(user.id);
+      await pizzaService.deleteUser(user.id);
       setRefreshKey((k) => k + 1);
     } catch (error) {
       console.error('Failed to delete user:', error);
@@ -88,7 +88,7 @@ export default function AdminDashboard(props: Props) {
                       </thead>
                       {franchiseList.franchises.map((franchise, findex) => {
                         return (
-                          <tbody key={findex} className="divide-y divide-gray-200">
+                          <tbody key={franchise.id || findex} className="divide-y divide-gray-200">
                             <tr className="border-neutral-500 border-t-2">
                               <td className="text-start px-2 whitespace-nowrap text-l font-mono text-orange-600">{franchise.name}</td>
                               <td className="text-start px-2 whitespace-nowrap text-sm font-normal text-gray-800" colSpan={3}>
@@ -104,7 +104,7 @@ export default function AdminDashboard(props: Props) {
 
                             {franchise.stores.map((store, sindex) => {
                               return (
-                                <tr key={sindex} className="bg-neutral-100">
+                                <tr key={store.id || sindex} className="bg-neutral-100">
                                   <td className="text-end px-2 whitespace-nowrap text-sm text-gray-800" colSpan={3}>
                                     {store.name}
                                   </td>
@@ -167,8 +167,8 @@ export default function AdminDashboard(props: Props) {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {userList.users.map((user, index) => (
-                          <tr key={index} className="bg-neutral-100">
+                        {userList.users.map((user) => (
+                          <tr key={user.id} className="bg-neutral-100">
                             <td className="text-start px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-800">{user.name}</td>
                             <td className="text-start px-4 py-2 whitespace-nowrap text-sm text-gray-600">{user.email}</td>
                             <td className="text-start px-4 py-2 whitespace-nowrap text-sm text-gray-600">
