@@ -117,6 +117,18 @@ test('filters the user list based on search input', async ({ page }) => {
         "more": false
     };
 
+    // Mock PUT /api/auth (login)
+    await page.route('*/**/api/auth', async (route) => {
+        const req = route.request();
+        if (req.method() === 'PUT') {
+            await route.fulfill({
+                json: { user: adminUser, token: 'adminToken' },
+            });
+        } else {
+            await route.continue();
+        }
+    });
+
     // Mock the user API endpoints
     await page.route('*/**/api/user**', async (route) => {
         const req = route.request();
@@ -175,6 +187,18 @@ test('deletes a user and updates the table', async ({ page }) => {
     // Create a mutable copy of the users for this specific test
     let currentUsers = [...regularUsers];
 
+    // Mock PUT /api/auth (login)
+    await page.route('*/**/api/auth', async (route) => {
+        const req = route.request();
+        if (req.method() === 'PUT') {
+            await route.fulfill({
+                json: { user: adminUser, token: 'adminToken' },
+            });
+        } else {
+            await route.continue();
+        }
+    });
+
     // Mock the user API endpoints
     await page.route('*/**/api/user**', async (route) => {
         const req = route.request();
@@ -204,8 +228,8 @@ test('deletes a user and updates the table', async ({ page }) => {
         await route.fulfill({ json: franchisesPageResponse });
     });
 
-    // Login and navigate
-    await page.goto('http://localhost:5173/');
+    // Login and navigate — use relative '/' instead of hardcoded localhost URL
+    await page.goto('/');
     await page.getByRole('link', { name: 'Login' }).click();
     await page.getByRole('textbox', { name: 'Email address' }).fill('a@jwt.com');
     await page.getByRole('textbox', { name: 'Password' }).fill('admin');
