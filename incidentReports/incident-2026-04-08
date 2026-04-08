@@ -1,0 +1,61 @@
+# Incident: 2026-04-08 20-44-05
+
+## Summary
+
+Between the hour of 20:44 UTC and 20:48 UTC on 2026-04-08, 12 users encountered unable to place pizza orders due to chaos testing. The event was triggered by chaos testing at 20:44 UTC. The call to the `/chaos` endpoint triggered the chaos testing failure mode.
+
+The event was detected by Grafana IRM and notified the on-call team member via push notification and SMS at 20:46 UTC. The team  acknowledged the alert and started working on the event by 20:47 UTC, being resolved by 20:48 UTC. This high-severity incident affected 100% of users during the four minute window between detection and resolution.
+
+
+## Detection
+
+This incident was detected when the `jwt-pizza-service` Chaos Testing alert was triggered and paged the on-call team member (Josh Breiter). Logs on the JWT Pizza Service dashboard corroborated the failure caused by chaos testing.
+
+The detection threshold was tuned low enough to enable quick detection and remediation of the issue.
+
+## Impact
+
+For 4 minutes between 20:44 UTC and 20:48 UTC on 04/08/26, all pizza order creation requests failed for the 12 users active during the incident window.
+
+No support tickets were opened as part of this incident.
+
+## Timeline
+
+All times are UTC.
+
+- 20:44:05 - External chaos monkey calls the `/chaos` endpoint and initiates the chaos testing failure
+- 20:46 - Enough failures have accumulated to trigger the 1 minute failure accumulation threshold
+- 20:46 - Alert monitoring detects the 500 error on the `/api/order` path and detects the "Chaos monkey" string in the log content
+- 20:46 - Alert is dispatched to on-call team member via Grafana IRM
+- 20:47 - Alert was ackowledged by Josh Breiter
+- 20:48 - Using error logs, the failure mode was identified
+- 20:48 - The reportUrl contained in the factory error log was visited to stop the chaos test (https://pizza-factory.cs329.click/api/support/d231864fc7f04558bc34e28866150374/report/1op809se)
+- 20:52 - After monitoring for further events and placing a test order without issue, the on-call engineer determines that the issue has been resolved and marks it resolved in Grafana IRM.
+- 21:25 - Incident report published to GitHub.
+```
+
+## Response
+
+After receiving a page at 20:46 UTC, Josh Breiter came online at 20:48 UTC in Grafana. Upon examining the error responses, the reportUrl embedded in the response was visited. 
+
+After visiting the URL, further monitoring of the system and a test order was placed to ensure that the system was functioning correctly.
+
+```
+
+## Root cause
+
+The chaos testing endpoint was called by an external individual with access to the admin account.
+
+## Resolution
+
+By visting the embedded report URL, the chaos testing was stopped. This signaled to the factory that the chaos event had been ackowledged, after which the system returned to normal operation.
+
+## Prevention
+
+To prevent this in the future, the admin password should be rotated on a regular basis. In addition to that, additional restrictions will be placed around who can initiate chaos testing. 
+
+## Action items
+
+1. Rotate admin password on a regular basis
+2. Place addtional restrictions on chaos testing endpoint to avoid accidentally invoking it
+```
